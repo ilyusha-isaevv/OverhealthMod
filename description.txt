@@ -1,0 +1,27 @@
+Overhealth is a mod that introduces a temporary overhealing mechanic.
+
+How it works:
+When you receive healing while already at maximum health, any excess healing is converted into temporary Overhealth. Overhealth slowly decays over time.
+This mechanic supports various healing methods, including:
+- Healing potions
+- Collecting hearts from the ground
+- Spectre Armor set bonus healing and etc.
+
+This mod works in multiplayer.
+
+UI Support:
+The mod displays your health over your maximum health (e.g., 520/400 HP).
+It supports all vanilla health display sets (Classic, Fancy, and Horizontal Bars).
+
+Mod Configuration:
+Gameplayer config contains (it's recommended to keep it at default values):
+- Overall decay rate multiplier.
+- Constant decay rate (percentage of max life per second).
+- Progressive decay rate (additional decay based on current overhealth amount).
+
+Cross-Mod Compatibility:
+At the moment of release (v1.0), this mod does not have cross-mod compatibility, meaning:
+- other mods might bypass or break the overhealth mechanic (e.g. reset overhealth to 0).
+- custom healing methods introduced by other mods will not transfer excess healing into overhealth.
+
+Official compatibility for other popular mods will be added in future updates.
