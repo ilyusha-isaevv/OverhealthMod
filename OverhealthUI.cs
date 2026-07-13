@@ -1,7 +1,13 @@
+using System;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Cil;
 using ReLogic.Content;
 using Terraria;
+using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.ResourceSets;
 using Terraria.ModLoader;
 
@@ -17,6 +23,7 @@ public class OverhealthUI : ModSystem
     private Asset<Texture2D> _fancyHeartMiddle;
     private Asset<Texture2D> _fancyHeartRight;
     private Asset<Texture2D> _fancyHeartSingle;
+    private Asset<Texture2D> _healthBarTexture;
 
     public override void Load()
     {
@@ -28,10 +35,109 @@ public class OverhealthUI : ModSystem
         _fancyHeartMiddle = Mod.Assets.Request<Texture2D>("Assets/Fancy/Middle");
         _fancyHeartRight = Mod.Assets.Request<Texture2D>("Assets/Fancy/Right");
         _fancyHeartSingle = Mod.Assets.Request<Texture2D>("Assets/Fancy/Single");
+        _healthBarTexture = Mod.Assets.Request<Texture2D>("Assets/HealthBar");
 
+        // Vanilla health bar display sets
         On_ClassicPlayerResourcesDisplaySet.DrawLife += DrawClassicOverhealth;
         On_FancyClassicPlayerResourcesDisplaySet.DrawLifeBar += DrawFancyOverhealth;
         On_HorizontalBarsPlayerResourcesDisplaySet.Draw += DrawHorizontalBarsOverhealth;
+
+        // Multiplayer health bars
+        IL_Main.DrawInterface_14_EntityHealthBars += ILModify_Main_OtherPlayersHealthbarOverhealth; // Under players
+        On_NewMultiplayerClosePlayersOverlay.Draw += MultiplayerHealthbarOverhealth; // Offscreen teammates
+
+    }
+
+    private void ILModify_Main_OtherPlayersHealthbarOverhealth(ILContext il)
+    {
+        try
+        {
+            ILCursor c = new(il);
+            c.GotoNext(i => i.MatchLdfld<Player>("statLifeMax2")); // if (... && Main.player[k].statLife != Main.player[k].statLifeMax2)
+            // Move after DrawHealthBar
+            c.GotoNext(MoveType.After, i => i.MatchCall<Main>("DrawHealthBar"));
+
+            c.EmitLdloc(27); // Player index
+            c.EmitDelegate((int playerIdx) =>
+            {
+                Player p = Main.player[playerIdx];
+                int overhealth = p.GetModPlayer<OverhealthPlayer>().Overhealth;
+
+                Vector2 pos = p.Bottom;
+                pos.Y += 10f + p.gfxOffY;
+
+                float alpha = p.stealth * Lighting.Brightness((int)(p.Center.X / 16f), (int)(p.Center.Y / 16f));
+                DrawOverhealthOverHealthBar(pos, overhealth, p.statLifeMax2, alpha, 1f, false);
+            });
+        }
+        catch (Exception)
+        {
+            MonoModHooks.DumpIL(Mod, il);
+        }
+    }
+
+    private void MultiplayerHealthbarOverhealth(On_NewMultiplayerClosePlayersOverlay.orig_Draw orig, NewMultiplayerClosePlayersOverlay self)
+    {
+        orig(self);
+        if (Main.teamNamePlateDistance <= 0)
+            return;
+
+        // It's impossible to cast object list (object) to list of objects (List<object>), so use IList
+        IList offscreenPlayersListObj = (IList)self.GetType().GetField("_playerOffScreenCache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+        // Reference for PlayerOffScreenCache struct is unavailable. Getting the type another way
+        Type playerOffScreenCacheType = offscreenPlayersListObj.GetType().GetGenericArguments().Single();
+        FieldInfo playerField = playerOffScreenCacheType.GetField("player", BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo distanceDrawPositionField = playerOffScreenCacheType.GetField("distanceDrawPosition", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
+        // Logic taken from System.Void Terraria.GameContent.UI.NewMultiplayerClosePlayersOverlay/PlayerOffScreenCache::DrawLifeBar()
+        foreach (object playerCache in offscreenPlayersListObj)
+        {
+            Player player = (Player)playerField.GetValue(playerCache);
+            Vector2 distanceDrawPosition = (Vector2)distanceDrawPositionField.GetValue(playerCache);
+
+            int overhealth = player.GetModPlayer<OverhealthPlayer>().Overhealth;
+            DrawOverhealthOverHealthBar(Main.screenPosition + distanceDrawPosition + new Vector2(26f, 20f), overhealth, player.statLifeMax2, 1f, 1.25f, false);
+        }
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, Main.UIScaleMatrix);
+    }
+
+    private void DrawOverhealthOverHealthBar(Vector2 pos, int overhealth, int maxLife, float alpha, float scale = 1f, bool noFlip = false)
+    {
+        if (overhealth <= 0) return;
+
+        // Logic taken from System.Void Terraria.Main::DrawHealthBar()
+        float num3 = pos.X - 18f * scale;
+        float num4 = pos.Y;
+        if (Main.LocalPlayer.gravDir == -1f && !noFlip)
+        {
+            num4 -= Main.screenPosition.Y;
+            num4 = Main.screenPosition.Y + Main.screenHeight - num4;
+        }
+
+        Vector2 drawPosition = new Vector2(num3 - Main.screenPosition.X, num4 - Main.screenPosition.Y);
+
+        float percentFilled = (float)overhealth / maxLife;
+        if (percentFilled > 1f) percentFilled = 1f;
+
+        int widthToDraw = (int)(36f * percentFilled);
+        if (widthToDraw <= 0) return;
+
+        Rectangle sourceRect = new(0, 0, widthToDraw, _healthBarTexture.Value.Height); ;
+
+        Main.spriteBatch.Draw(
+            _healthBarTexture.Value,
+            drawPosition,
+            sourceRect,
+            Color.White * alpha * 0.7f,
+            0f,
+            Vector2.Zero,
+            scale,
+            SpriteEffects.None,
+            0f
+        );
     }
 
     private void DrawClassicOverhealth(On_ClassicPlayerResourcesDisplaySet.orig_DrawLife orig, ClassicPlayerResourcesDisplaySet self)
