@@ -4,8 +4,6 @@ using Terraria.ID;
 
 namespace OverhealthMod;
 
-
-
 public partial class OverhealthMod
 {
     internal enum MessageType : byte
@@ -20,12 +18,12 @@ public partial class OverhealthMod
         switch (messageType)
         {
             case MessageType.SyncOverhealth:
-                byte playerIndex = reader.ReadByte();
-                OverhealthPlayer player = Main.player[playerIndex].GetModPlayer<OverhealthPlayer>();
+                byte playerIdx = reader.ReadByte();
+                OverhealthPlayer player = Main.player[playerIdx].GetModPlayer<OverhealthPlayer>();
                 player.RecieveSyncPlayer(reader);
 
                 if (Main.netMode == NetmodeID.Server)
-                    player.SyncPlayer(-1, playerIndex, false);
+                    player.SyncPlayer(-1, playerIdx, false);
                 break;
         }
     }
