@@ -1,3 +1,4 @@
 displayName = Overhealth
 author = JADen
 version = 1.0
+side = Both

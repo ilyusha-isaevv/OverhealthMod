@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 
 namespace OverhealthMod;
 
+[Autoload(Side = ModSide.Client)]
 public class OverhealthUI : ModSystem
 {
     private Asset<Texture2D> _horizontalBarLeftPanelTexture;
