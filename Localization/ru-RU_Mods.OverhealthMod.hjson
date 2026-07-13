@@ -1,0 +1,32 @@
+Colors: {
+	// UsefulToKnow: FE95FF
+	// Mention: FFAB65
+}
+
+Configs: {
+	GameplayConfig: {
+		DisplayName: Настройки геймплея
+
+		ConstantDecreaseRate: {
+			Name: Постоянная скорость распада
+			Label: "[c/A3C6FF:Постоянная] скорость распада"
+			Tooltip: Базовая скорость потери сверхздоровья, выраженная в [c/{$Colors.UsefulToKnow}:процентах от максимального здоровья в секунду].
+		}
+
+		ProgressiveDecreaseRate: {
+			Name: Прогрессивная скорость распада
+			Label: "[c/C5A3FF:Прогрессивная] скорость распада"
+			Tooltip:
+				'''
+				Дополнительная скорость распада, которая зависит от вашего текущего сверхздоровья.
+				Это значение определяет дополнительную скорость распада при 100% сверхздоровья, которая [c/{$Colors.UsefulToKnow}:линейно] снижается до 0% при 0% сверхздоровья.
+				Выражается в [c/{$Colors.UsefulToKnow}:процентах от максимального здоровья в секунду].
+				'''
+		}
+
+		OverhealthDecreaseRateMutiplier: {
+			Label: Множитель скорости [c/FFA3A3:распада]
+			Tooltip: Общий множитель, применяемый как к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecreaseRate.Name}], так и к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecreaseRate.Name}].
+		}
+	}
+}
