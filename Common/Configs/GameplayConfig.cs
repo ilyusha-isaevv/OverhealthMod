@@ -8,14 +8,14 @@ public class GameplayConfig : ModConfig
 {
     public override ConfigScope Mode => ConfigScope.ServerSide;
 
-    [Range(1.5f, 10f)]
+    [Range(1f, 10f)]
     [Increment(0.1f)]
-    [DefaultValue(2f)]
+    [DefaultValue(1.2f)]
     public float ConstantDecreaseRate { get; set; }
 
-    [Range(4f, 20f)]
+    [Range(5f, 20f)]
     [Increment(0.1f)]
-    [DefaultValue(5f)]
+    [DefaultValue(5.8f)]
     public float ProgressiveDecreaseRate { get; set; }
 
     [Range(1f, 3f)]
