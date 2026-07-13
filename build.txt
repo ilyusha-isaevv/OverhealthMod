@@ -1,4 +1,5 @@
 displayName = Overhealth
 author = JADen
 version = 1.0
+buildIgnore = Other/*, *.aseprite
 side = Both
