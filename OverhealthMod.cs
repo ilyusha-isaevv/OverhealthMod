@@ -1,8 +1,6 @@
+using System.IO;
 using Terraria.ModLoader;
 
 namespace OverhealthMod;
 
-public class OverhealthMod : Mod
-{
-    
-}
+public partial class OverhealthMod : Mod { }

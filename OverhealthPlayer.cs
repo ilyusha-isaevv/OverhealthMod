@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using MonoMod.Cil;
 using OverhealthMod.Common.Configs;
 using Terraria;
@@ -61,7 +62,29 @@ public class OverhealthPlayer : ModPlayer
 
     public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
     {
-        base.SyncPlayer(toWho, fromWho, newPlayer);
+        ModPacket packet = Mod.GetPacket();
+        packet.Write((byte)OverhealthMod.MessageType.SyncOverhealth);
+        packet.Write((byte)Player.whoAmI);
+        packet.Write(Overhealth);
+        packet.Send(toWho, fromWho);
+    }
+
+    public override void CopyClientState(ModPlayer targetCopy)
+    {
+        OverhealthPlayer clone = (OverhealthPlayer)targetCopy;
+        clone._overhealth = _overhealth;
+    }
+
+    public override void SendClientChanges(ModPlayer clientPlayer)
+    {
+        OverhealthPlayer clone = (OverhealthPlayer)clientPlayer;
+        if (clone._overhealth != _overhealth)
+            SyncPlayer(-1, Main.myPlayer, false);
+    }
+
+    public void RecieveSyncPlayer(BinaryReader reader)
+    {
+        Overhealth = reader.ReadInt32();
     }
 
     /// <summary>
