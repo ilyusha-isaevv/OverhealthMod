@@ -1,1 +1,36 @@
+Colors: {
+	UsefulToKnow: FE95FF
+	Mention: FFAB65
+}
 
+Configs: {
+	GameplayConfig: {
+		DisplayName: Gameplay Config
+
+		ConstantDecreaseRate: {
+			Name: Constant decay rate
+			Label: "[c/A3C6FF:Constant] decay rate"
+			Tooltip:
+				'''
+				The base rate at which overhealth decays.
+				Expressed as a [c/{$Colors.UsefulToKnow}:percentage of max life per second].
+				'''
+		}
+
+		ProgressiveDecreaseRate: {
+			Name: Progressive decay rate
+			Label: "[c/C5A3FF:Progressive] decay rate"
+			Tooltip:
+				'''
+				Additional decay rate that scales with your current overhealth.
+				This value is the extra decay rate at 100% overhealth, scaling down [c/{$Colors.UsefulToKnow}:linearly] to 0% at 0% overhealth.
+				Expressed as a [c/{$Colors.UsefulToKnow}:percentage of max life per second].
+				'''
+		}
+
+		OverhealthDecreaseRateMutiplier: {
+			Label: Decay rate [c/FFA3A3:multiplier]
+			Tooltip: Overall multiplier applied to both the [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecreaseRate.Name}] and [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecreaseRate.Name}].
+		}
+	}
+}
