@@ -35,7 +35,7 @@ public class OverhealthPlayer : ModPlayer
         internal set
         {
             if (Player.creativeGodMode)
-                Overhealth = 0;
+                _overhealth = 0;
             else
                 _overhealth = Math.Clamp(value, 0, Player.statLifeMax2);
 
@@ -57,6 +57,11 @@ public class OverhealthPlayer : ModPlayer
         int currentOverhealth = player.statLife - player.statLifeMax2;
         if (currentOverhealth < overhealthPlayer.Overhealth)
             overhealthPlayer.Overhealth = currentOverhealth;
+    }
+
+    public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
+    {
+        base.SyncPlayer(toWho, fromWho, newPlayer);
     }
 
     /// <summary>
