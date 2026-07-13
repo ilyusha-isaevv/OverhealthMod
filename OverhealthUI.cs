@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using ReLogic.Content;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.ResourceSets;
 using Terraria.ModLoader;
@@ -152,25 +153,18 @@ public class OverhealthUI : ModSystem
         float hpSegmentValue = statsSnapshot.LifePerSegment;
         int hpSegments = statsSnapshot.AmountOfLifeHearts;
 
-        int uiScreenAnchorX = (int)self.GetType().GetField("UI_ScreenAnchorX", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(self);
+        int uiScreenAnchorX = (int)self.GetType().GetField("UI_ScreenAnchorX", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(self);
 
         SpriteBatch spriteBatch = Main.spriteBatch;
 
-        const int vanillaHeartWidth = 11;
-        const int vanillaHeartHeight = 11;
+        int overhealthHeartWidth = _classicHeartTexture.Width();
+        int overhealthHeartHeight = _classicHeartTexture.Height();
 
         for (int segmentIndex = 1; segmentIndex <= hpSegments; segmentIndex++)
         {
             float percentFilled = (overhealth - (segmentIndex - 1) * hpSegmentValue) / hpSegmentValue;
             if (percentFilled <= 0f) break;
-
-            float scale = 1f;
-            float opacity = 0.55f;
-            if (percentFilled < 1f)
-            {
-                scale = percentFilled / 4f + 0.75f; // From vanilla
-                opacity = 0.15f + 0.4f * percentFilled;
-            }
+            float opacity = percentFilled >= 1f ? 0.6f : 0.15f + 0.45f * percentFilled;
 
             int segmentXOffset = 0;
             int segmentYOffset = 0;
@@ -182,8 +176,8 @@ public class OverhealthUI : ModSystem
 
             // From Terraria.GameContent.UI.ResourceSets.ClassicPlayerResourcesDisplaySet.DrawLife
             Vector2 position = new(
-                (float)(500f + 26f * (segmentIndex - 1) + segmentXOffset + uiScreenAnchorX + vanillaHeartWidth / 2f) - 2f,
-                32f + segmentYOffset + (float)(vanillaHeartHeight / 2f) - 2f
+                500f + 26f * (segmentIndex - 1) + segmentXOffset + uiScreenAnchorX + TextureAssets.Heart.Width() / 2f,
+                32f + segmentYOffset + TextureAssets.Heart.Height() / 2f
             );
 
             spriteBatch.Draw(
@@ -192,8 +186,8 @@ public class OverhealthUI : ModSystem
                 null,
                 Color.White * opacity,
                 0f,
-                new Vector2(vanillaHeartWidth / 2f, vanillaHeartHeight / 2f),
-                scale,
+                new Vector2(overhealthHeartWidth / 2f, overhealthHeartHeight / 2f),
+                1f,
                 SpriteEffects.None,
                 0f
             );
