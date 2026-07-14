@@ -2,7 +2,6 @@ using System;
 using MonoMod.Cil;
 using OverhealthMod.Common.Configs;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace OverhealthMod;

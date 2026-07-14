@@ -1,5 +1,6 @@
 displayName = Overhealth
 author = JADen
 version = 1.1
+weakReferences = ThoriumMod
 buildIgnore = Other/*, *.aseprite
 side = Both
