@@ -10,12 +10,12 @@ public class GameplayConfig : ModConfig
 
     [Range(1f, 10f)]
     [Increment(0.1f)]
-    [DefaultValue(1.2f)]
+    [DefaultValue(1.3f)]
     public float ConstantDecreaseRate { get; set; }
 
     [Range(5f, 20f)]
     [Increment(0.1f)]
-    [DefaultValue(5.8f)]
+    [DefaultValue(6f)]
     public float ProgressiveDecreaseRate { get; set; }
 
     [Range(1f, 3f)]
