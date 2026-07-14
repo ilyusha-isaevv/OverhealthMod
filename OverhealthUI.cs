@@ -62,13 +62,12 @@ public class OverhealthUI : ModSystem
             c.EmitDelegate((int playerIdx) =>
             {
                 Player p = Main.player[playerIdx];
-                int overhealth = p.GetModPlayer<OverhealthPlayer>().Overhealth;
 
                 Vector2 pos = p.Bottom;
                 pos.Y += 10f + p.gfxOffY;
 
                 float alpha = p.stealth * Lighting.Brightness((int)(p.Center.X / 16f), (int)(p.Center.Y / 16f));
-                DrawOverhealthOverHealthBar(pos, overhealth, p.statLifeMax2, alpha, 1f, false);
+                DrawOverhealthOverHealthBar(pos, p.GetOverhealth(), p.statLifeMax2, alpha, 1f, false);
             });
         }
         catch (Exception)
@@ -97,9 +96,7 @@ public class OverhealthUI : ModSystem
         {
             Player player = (Player)playerField.GetValue(playerCache);
             Vector2 distanceDrawPosition = (Vector2)distanceDrawPositionField.GetValue(playerCache);
-
-            int overhealth = player.GetModPlayer<OverhealthPlayer>().Overhealth;
-            DrawOverhealthOverHealthBar(Main.screenPosition + distanceDrawPosition + new Vector2(26f, 20f), overhealth, player.statLifeMax2, 1f, 1.25f, false);
+            DrawOverhealthOverHealthBar(Main.screenPosition + distanceDrawPosition + new Vector2(26f, 20f), player.GetOverhealth(), player.statLifeMax2, 1f, 1.25f, false);
         }
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, Main.UIScaleMatrix);
@@ -145,8 +142,7 @@ public class OverhealthUI : ModSystem
     {
         orig(self);
 
-        OverhealthPlayer overhealthPlayer = Main.LocalPlayer.GetModPlayer<OverhealthPlayer>();
-        int overhealth = overhealthPlayer.Overhealth;
+        int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
 
         PlayerStatsSnapshot statsSnapshot = new(Main.LocalPlayer);
@@ -198,8 +194,7 @@ public class OverhealthUI : ModSystem
     {
         orig(self, spriteBatch);
 
-        OverhealthPlayer overhealthPlayer = Main.LocalPlayer.GetModPlayer<OverhealthPlayer>();
-        int overhealth = overhealthPlayer.Overhealth;
+        int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
 
         PlayerStatsSnapshot statsSnapshot = new(Main.LocalPlayer);
@@ -286,8 +281,7 @@ public class OverhealthUI : ModSystem
     {
         orig(self);
 
-        OverhealthPlayer overhealthPlayer = Main.LocalPlayer.GetModPlayer<OverhealthPlayer>();
-        int overhealth = overhealthPlayer.Overhealth;
+        int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
 
         const int maxHpSegments = 20;
