@@ -5,6 +5,9 @@ using Terraria.ModLoader;
 
 namespace OverhealthMod.Utils;
 
+/// <summary>
+/// Contains methods for quickly editing methods using MonoMod.
+/// </summary>
 public static class QuickIL
 {
     public static void EditMethod<T>(string methodName, ILContext.Manipulator manipulator) => EditMethod(typeof(T).GetMethod(methodName), manipulator);

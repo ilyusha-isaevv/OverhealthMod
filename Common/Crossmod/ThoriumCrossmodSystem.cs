@@ -25,80 +25,55 @@ public class ThoriumCrossmodSystem : ModSystem
 
         // Core methods
         QuickIL.EditMethod(typeof(PlayerHelper), nameof(PlayerHelper.HealLife), ILModify_PlayerHelper_HealLife); // Remove health cap and set `true` for `healOverMax`
-        QuickIL.EditMethod(thoriumModAssembly, "ThoriumMod.Utilities.ProjectileHelper", "CanBeHealed", IL_RemoveHealthCap(i => i.MatchLdarg2()));
+        QuickIL.EditMethod(thoriumModAssembly, "ThoriumMod.Utilities.ProjectileHelper", "CanBeHealed", CommonIL.RemoveHealthCapCheck(i => i.MatchLdarg2()));
 
         // Weapons
-        QuickIL.EditMethod<HereticBreaker>(nameof(HereticBreaker.OnHitNPC), IL_RemoveHealthCap(i => i.MatchLdloc(7)));
-        QuickIL.EditMethod<Recuperate>(nameof(Recuperate.CanUseItem), IL_RemoveHealthCap(i => i.MatchLdarg1()));
-        QuickIL.EditMethod<HolyHammer>(nameof(HolyHammer.Shoot), IL_RemoveHealthCap(i => i.MatchLdloc3()));
-        QuickIL.EditMethod<SmitingHammer>(nameof(SmitingHammer.Shoot), IL_RemoveHealthCap(i => i.MatchLdloc(9)));
-        QuickIL.EditMethod<TerrariansLastKnife>(nameof(TerrariansLastKnife.OnHitNPC), IL_RemoveHealthCap(i => i.MatchLdarg1()));
+        QuickIL.EditMethod<HereticBreaker>(nameof(HereticBreaker.OnHitNPC), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(7)));
+        QuickIL.EditMethod<Recuperate>(nameof(Recuperate.CanUseItem), CommonIL.RemoveHealthCapCheck(i => i.MatchLdarg1()));
+        QuickIL.EditMethod<HolyHammer>(nameof(HolyHammer.Shoot), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<SmitingHammer>(nameof(SmitingHammer.Shoot), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(9)));
+        QuickIL.EditMethod<TerrariansLastKnife>(nameof(TerrariansLastKnife.OnHitNPC), CommonIL.RemoveHealthCapCheck(i => i.MatchLdarg1()));
 
         // Projectiles
-        QuickIL.EditMethod<BloodTransfusionPro>(nameof(BloodTransfusionPro.OnHitNPC), IL_RemoveHealthCap(i => i.MatchLdloc0()));
-        QuickIL.EditMethod<BloodTransfusionProReturn>(nameof(BloodTransfusionProReturn.AI), IL_RemoveHealthCap(i => i.MatchLdloc1()));
-        QuickIL.EditMethod<MorningDewPro>(nameof(MorningDewPro.OnFirstHit), IL_RemoveHealthCap(i => i.MatchLdloc3()));
-        QuickIL.EditMethod<BiotechProbe>(nameof(BiotechProbe.AI), IL_RemoveHealthCap(i => i.MatchLdloc(4))); // Biotech armor set
-        QuickIL.EditMethod<CelestialWandPro>(nameof(CelestialWandPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(12)));
-        QuickIL.EditMethod<CellReconstructorPro>(nameof(CellReconstructorPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(11)));
-        QuickIL.EditMethod<ChiLanternPro>(nameof(ChiLanternPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(5)));
-        QuickIL.EditMethod<CleansingWaterPouchPro>(nameof(CleansingWaterPouchPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(11)));
-        QuickIL.EditMethod<CosmicFluxStaffPro>(nameof(CosmicFluxStaffPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(4)));
-        QuickIL.EditMethod<FlanPlatterPro>(nameof(FlanPlatterPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(6)));
-        QuickIL.EditMethod<GraveGoodPro>(nameof(GraveGoodPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(4)));
-        QuickIL.EditMethod<HealingBeam>(nameof(HealingBeam.AI), IL_RemoveHealthCap(i => i.MatchLdloc(8))); // Divine Suff projectile
-        QuickIL.EditMethod<IridescentPro>(nameof(IridescentPro.OnHitNPC), IL_RemoveHealthCap(i => i.MatchLdloc3()));
-        QuickIL.EditMethod<LifeDeathPro2>(nameof(LifeDeathPro2.AI), IL_RemoveHealthCap(i => i.MatchLdloc(12)));
-        QuickIL.EditMethod<LifeDisperserPro>(nameof(LifeDisperserPro.OnHitNPC), IL_RemoveHealthCap(i => i.MatchLdloc3()));
-        QuickIL.EditMethod<LifeOrb>(nameof(LifeOrb.AI), IL_RemoveHealthCap(i => i.MatchLdloc(15))); // Life Essence Apparatus projectile
-        QuickIL.EditMethod<LifeSpirit>(nameof(LifeSpirit.AI), IL_RemoveHealthCap(i => i.MatchLdloc0())); // Twinkle minion/projectile
-        QuickIL.EditMethod<LifeSurgeHeal>(nameof(LifeSurgeHeal.AI), IL_RemoveHealthCap(i => i.MatchLdloc(12)));
-        QuickIL.EditMethod<LifeSurgeHealExtra>(nameof(LifeSurgeHealExtra.AI), IL_RemoveHealthCap(i => i.MatchLdloc(12)));
-        // QuickIL.EditMethod<LightBeamPro>(nameof(LightBeamPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(4))); // Light-burst wand projectile - uses nameless delegate
-        QuickIL.EditMethod<LilCherubsWandPro>(nameof(LilCherubsWandPro.SafeAI), IL_RemoveHealthCap(i => i.MatchLdloc3()));
-        QuickIL.EditMethod<NecroticStaffPro>(nameof(NecroticStaffPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(15)));
-        QuickIL.EditMethod<OrbLight>(nameof(OrbLight.AI), IL_RemoveHealthCap(i => i.MatchLdloc(4))); // Twilight Staff projectile
-        QuickIL.EditMethod<OrbLight2>(nameof(OrbLight2.AI), IL_RemoveHealthCap(i => i.MatchLdloc0())); // Twilight Staff projectile
-        QuickIL.EditMethod<ProphecyPro>(nameof(ProphecyPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(5)));
-        QuickIL.EditMethod<PumpkinHealerPro>(nameof(PumpkinHealerPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(9))); // Snack'o'Lantern projectile
+        QuickIL.EditMethod<BloodTransfusionPro>(nameof(BloodTransfusionPro.OnHitNPC), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc0()));
+        QuickIL.EditMethod<BloodTransfusionProReturn>(nameof(BloodTransfusionProReturn.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc1()));
+        QuickIL.EditMethod<MorningDewPro>(nameof(MorningDewPro.OnFirstHit), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<BiotechProbe>(nameof(BiotechProbe.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(4))); // Biotech armor set
+        QuickIL.EditMethod<CelestialWandPro>(nameof(CelestialWandPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(12)));
+        QuickIL.EditMethod<CellReconstructorPro>(nameof(CellReconstructorPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(11)));
+        QuickIL.EditMethod<ChiLanternPro>(nameof(ChiLanternPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(5)));
+        QuickIL.EditMethod<CleansingWaterPouchPro>(nameof(CleansingWaterPouchPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(11)));
+        QuickIL.EditMethod<CosmicFluxStaffPro>(nameof(CosmicFluxStaffPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(4)));
+        QuickIL.EditMethod<FlanPlatterPro>(nameof(FlanPlatterPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(6)));
+        QuickIL.EditMethod<GraveGoodPro>(nameof(GraveGoodPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(4)));
+        QuickIL.EditMethod<HealingBeam>(nameof(HealingBeam.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(8))); // Divine Suff projectile
+        QuickIL.EditMethod<IridescentPro>(nameof(IridescentPro.OnHitNPC), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<LifeDeathPro2>(nameof(LifeDeathPro2.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(12)));
+        QuickIL.EditMethod<LifeDisperserPro>(nameof(LifeDisperserPro.OnHitNPC), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<LifeOrb>(nameof(LifeOrb.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(15))); // Life Essence Apparatus projectile
+        QuickIL.EditMethod<LifeSpirit>(nameof(LifeSpirit.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc0())); // Twinkle minion/projectile
+        QuickIL.EditMethod<LifeSurgeHeal>(nameof(LifeSurgeHeal.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(12)));
+        QuickIL.EditMethod<LifeSurgeHealExtra>(nameof(LifeSurgeHealExtra.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(12)));
+        // QuickIL.EditMethod<LightBeamPro>(nameof(LightBeamPro.AI), CommonIL.RemoveHealthCapIL(i => i.MatchLdloc(4))); // Light-burst wand projectile - uses nameless delegate
+        QuickIL.EditMethod<LilCherubsWandPro>(nameof(LilCherubsWandPro.SafeAI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<NecroticStaffPro>(nameof(NecroticStaffPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(15)));
+        QuickIL.EditMethod<OrbLight>(nameof(OrbLight.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(4))); // Twilight Staff projectile
+        QuickIL.EditMethod<OrbLight2>(nameof(OrbLight2.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc0())); // Twilight Staff projectile
+        QuickIL.EditMethod<ProphecyPro>(nameof(ProphecyPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(5)));
+        QuickIL.EditMethod<PumpkinHealerPro>(nameof(PumpkinHealerPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(9))); // Snack'o'Lantern projectile
         QuickIL.EditMethod<RecuperatePro>(nameof(RecuperatePro.AI), IlModify_RecuperatePro_AI);
-        QuickIL.EditMethod<SacredChargeChampion>(nameof(SacredChargeChampion.AI), IL_RemoveHealthCap(i => i.MatchLdloc0()));
-        QuickIL.EditMethod<TheGigaNeedlePro>(nameof(TheGigaNeedlePro.AI), IL_RemoveHealthCap(i => i.MatchLdloc3()));
+        QuickIL.EditMethod<SacredChargeChampion>(nameof(SacredChargeChampion.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc0()));
+        QuickIL.EditMethod<TheGigaNeedlePro>(nameof(TheGigaNeedlePro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc3()));
         QuickIL.EditMethod<UnboundFantasyPro>(nameof(UnboundFantasyPro.OnKill), ILModify_UnboundFantasyPro_OnKill);
-        QuickIL.EditMethod<ValhallasDescentPro>(nameof(ValhallasDescentPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc2()));
-        QuickIL.EditMethod<WallChickenPro>(nameof(WallChickenPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc1())); // On Viscount Rock Fall death
+        QuickIL.EditMethod<ValhallasDescentPro>(nameof(ValhallasDescentPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc2()));
+        QuickIL.EditMethod<WallChickenPro>(nameof(WallChickenPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc1())); // On Viscount Rock Fall death
 
         // Armor
-        QuickIL.EditMethod<ThoriumPlayer>(nameof(ThoriumPlayer.OnHurt), IL_RemoveHealthCap(i => i.MatchLdloc(22))); // Fallen Paladin set
-        QuickIL.EditMethod<ThoriumProjectileFix>("HealerOnHitNPC", IL_RemoveHealthCap(i => i.MatchLdloc(15))); // Iridescent set
+        QuickIL.EditMethod<ThoriumPlayer>(nameof(ThoriumPlayer.OnHurt), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(22))); // Fallen Paladin set
+        QuickIL.EditMethod<ThoriumProjectileFix>("HealerOnHitNPC", CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(15))); // Iridescent set
 
         // Minions
-        QuickIL.EditMethod<BannerMoraleHeartPro>(nameof(BannerMoraleHeartPro.AI), IL_RemoveHealthCap(i => i.MatchLdloc(5)));
-    }
-
-    private void ILCursor_RemoveHealthCap(ILCursor c, Predicate<Mono.Cecil.Cil.Instruction> LoadPlayerMatch)
-    {
-        c.GotoNext(MoveType.Before,
-            i => LoadPlayerMatch(i) && i.Next.MatchLdfld<Player>(nameof(Player.statLife)) &&
-            LoadPlayerMatch(i.Next.Next) && i.Next.Next.Next.MatchLdfld<Player>(nameof(Player.statLifeMax2))
-        ); // if (... && player.statLife (<=?|>=?|==) player.statLifeMax2 && ...)
-        c.RemoveRange(5); // Remove health cap check
-    }
-
-    private ILContext.Manipulator IL_RemoveHealthCap(Predicate<Mono.Cecil.Cil.Instruction> LoadPlayerMatch)
-    {
-        return il =>
-        {
-            try
-            {
-                ILCursor c = new(il);
-                ILCursor_RemoveHealthCap(c, LoadPlayerMatch);
-            }
-            catch (Exception)
-            {
-                MonoModHooks.DumpIL(Mod, il);
-            }
-        };
+        QuickIL.EditMethod<BannerMoraleHeartPro>(nameof(BannerMoraleHeartPro.AI), CommonIL.RemoveHealthCapCheck(i => i.MatchLdloc(5)));
     }
 
     private void ILModify_PlayerHelper_HealLife(ILContext il)
@@ -127,9 +102,9 @@ public class ThoriumCrossmodSystem : ModSystem
         try
         {
             ILCursor c = new(il);
-            ILCursor_RemoveHealthCap(c, i => i.MatchLdloc(8));
-            ILCursor_RemoveHealthCap(c, i => i.MatchLdloc(15));
-            ILCursor_RemoveHealthCap(c, i => i.MatchLdloc(22));
+            c.RemoveHealthCapCheck(i => i.MatchLdloc(8));
+            c.RemoveHealthCapCheck(i => i.MatchLdloc(15));
+            c.RemoveHealthCapCheck(i => i.MatchLdloc(22));
         }
         catch (Exception)
         {
