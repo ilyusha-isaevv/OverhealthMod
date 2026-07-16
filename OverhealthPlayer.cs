@@ -1,6 +1,8 @@
 using System;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using OverhealthMod.Common.Configs;
+using OverhealthMod.Utils;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -29,8 +31,7 @@ public class OverhealthPlayer : ModPlayer
     /// Constant decrease rate is <see cref="ConstantDecreaseRate"/> of max health per second.
     /// Progressive decrease rate is <see cref="ProgressiveDecreaseRate"/> of max health per second.
     /// </summary>
-    /// <see cref="PostUpdateEquips"/>
-    /// <see cref="_overhealthDecreaseCounter"/>
+    /// <see cref="DecreaseOverhealthTick"/>
     public int OverhealthDecreaseRate => (int)(OverhealthDecreaseRateMultiplier *
         ((Player.statLifeMax2 / 100f * ConstantDecreaseRate) + // Constant decrease rate
         (Overhealth / (float)Player.statLifeMax2 * Player.statLifeMax2 / 100f * ProgressiveDecreaseRate)) // Variable decrease rate based on current overhealth
@@ -57,8 +58,8 @@ public class OverhealthPlayer : ModPlayer
     public override void Load()
     {
         // Replace all health caps with CapOverhealth
-        IL_Player.ApplyLifeAndOrMana += ILModify_Player_ApplyLifeAndOrMana;
-        IL_Player.Heal += ILModify_Player_Heal;
+        IL_Player.ApplyLifeAndOrMana += CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0);
+        IL_Player.Heal += CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0);
         IL_Player.UpdateLifeRegen += ILModify_Player_UpdateLifeRegen;
         IL_Player.Update += ILModify_Player_Update;
         // Spectre armor set bonus healing
@@ -91,43 +92,6 @@ public class OverhealthPlayer : ModPlayer
             _overhealthDecreaseCounter %= 60;
 
             Player.statLife -= Math.Min(decrease, Overhealth);
-        }
-    }
-
-    private void ILModify_Player_ApplyLifeAndOrMana(ILContext il)
-    {
-        try
-        {
-            ILCursor c = new(il);
-            c.GotoNext(MoveType.After, i => i.MatchLdfld<Player>("statLife")); // this.statLife += num
-            c.GotoNext(MoveType.Before, i => i.MatchLdfld<Player>("statLife")); // if (this.statLife > this.statLifeMax2)
-            c.Index--;
-
-            c.RemoveRange(9); // Remove cap chec
-
-            c.EmitLdarg0(); // Load `this` (Player)
-            c.EmitCall(GetType().GetMethod(nameof(CapOverhealth), [typeof(Player)]));
-        }
-        catch (Exception)
-        {
-            MonoModHooks.DumpIL(Mod, il);
-        }
-    }
-
-    private void ILModify_Player_Heal(ILContext il)
-    {
-        try
-        {
-            ILCursor c = new(il);
-            c.GotoNext(MoveType.After, i => i.MatchCall<Player>(nameof(Player.HealEffect)));
-            c.RemoveRange(9); // Remove cap check
-
-            c.EmitLdarg0(); // Load `this` (Player)
-            c.EmitCall(GetType().GetMethod(nameof(CapOverhealth), [typeof(Player)]));
-        }
-        catch (Exception)
-        {
-            MonoModHooks.DumpIL(Mod, il);
         }
     }
 
