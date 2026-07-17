@@ -24,7 +24,7 @@ public class ThoriumCrossmodSystem : ModSystem
 {
     public override void Load()
     {
-        Assembly thoriumModAssembly = typeof(ThoriumMod.ThoriumMod).Assembly;
+        Assembly thoriumModAssembly = ModLoader.GetMod("ThoriumMod").Code;
 
         // Core methods
         QuickIL.EditMethod(typeof(PlayerHelper), nameof(PlayerHelper.HealLife), ILModify_PlayerHelper_HealLife); // Remove health cap and set `true` for `healOverMax`

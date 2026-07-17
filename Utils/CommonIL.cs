@@ -40,6 +40,23 @@ public static class CommonIL
         ); // ... player.statLife ?? player.statLifeMax2 ...
     }
 
+    private static void GotoHealthCap_Array(this ILCursor c)
+    {
+        while (true)
+        {
+            c.GotoNext(MoveType.Before, i => i.MatchLdsfld<Main>(nameof(Main.player)));
+
+            if (!c.Instrs[c.Index + 3].MatchLdfld<Player>(nameof(Player.statLife)))
+                c.Index += 4;
+            else if (!c.Instrs[c.Index + 4].MatchLdsfld<Main>(nameof(Main.player)))
+                c.Index += 5;
+            else if (!c.Instrs[c.Index + 7].MatchLdfld<Player>(nameof(Player.statLifeMax2)))
+                c.Index += 8;
+            else
+                break;
+        }
+    }
+
     public static void GotoAndRemoveHealthCapCheck(this ILCursor c, OpCode loadPlayerOpcode)
     {
         c.GotoHealthCap(loadPlayerOpcode);
@@ -50,6 +67,12 @@ public static class CommonIL
     {
         c.GotoHealthCap(loadPlayerOpcode, loadPlayerValue);
         c.RemoveRange(5); // Remove health cap check
+    }
+
+    public static void GotoAndRemoveHealthCapCheck_Array(this ILCursor c)
+    {
+        c.GotoHealthCap_Array();
+        c.RemoveRange(9); // Remove health cap check
     }
 
     public static void GotoAndReplaceHealthCapWithOverhealthCap(this ILCursor c, OpCode loadPlayerOpcode)
@@ -86,6 +109,12 @@ public static class CommonIL
             ILCursor c = new(il);
             c.GotoAndRemoveHealthCapCheck(loadPlayerOpcode, loadPlayerValue);
         };
+    }
+
+    public static void RemoveHealthCapCheck_Array(ILContext il)
+    {
+        ILCursor c = new(il);
+        c.GotoAndRemoveHealthCapCheck_Array();
     }
 
     public static ILContext.Manipulator ReplaceHealthCapWithOverhealthCap(OpCode loadPlayerOpcode)
