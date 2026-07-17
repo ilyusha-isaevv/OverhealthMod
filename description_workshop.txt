@@ -11,8 +11,7 @@ The config contains settings mostly for decay rates. Check it out to balance the
 [h2]Cross-Mod Compatibility[/h2]
 Unsupported mods might break the overhealth mechanic (e.g. reset overhealth to 0).
 
-At the moment of release (v1.2), this mod has the following compatibility status:
-Supported Mods:
+Currently this mod has the following supported mods:
 [table]
     [tr]
         [th]Mod[/th]
@@ -20,9 +19,14 @@ Supported Mods:
         [th]Comment[/th]
     [/tr]
     [tr]
+        [td]CalamityMod[/td]
+        [td]v2.2.1[/td]
+        [td][/td]
+    [/tr]
+    [tr]
         [td]ThoriumMod[/td]
         [td]v1.7.2.6[/td]
-        [td]Adjust decay rate multiplier, because Healing Class seems overpowered with default values.[/td]
+        [td]Adjust decay rate multiplier for Healing Class gameplay.[/td]
     [/tr]
 [/table]
 
