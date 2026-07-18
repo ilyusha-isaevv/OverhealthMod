@@ -10,6 +10,9 @@
 
 	<!-- References -->
 	<ItemGroup>
+		<Reference Include="CalamityEntropy">
+			<HintPath>..\ModAssemblies\CalamityEntropy_v3.20.dll</HintPath>
+		</Reference>
 		<Reference Include="CalamityMod">
 			<HintPath>..\ModAssemblies\CalamityMod_v2.2.1.dll</HintPath>
 		</Reference>

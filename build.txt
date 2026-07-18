@@ -1,6 +1,6 @@
 displayName = Overhealth
 author = JADen
 version = 1.3
-weakReferences = CalamityMod, ThoriumMod
+weakReferences = CalamityEntropy, CalamityMod, ThoriumMod
 buildIgnore = Other/*, *.aseprite
 side = Both
