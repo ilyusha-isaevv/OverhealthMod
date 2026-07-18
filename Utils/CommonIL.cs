@@ -169,7 +169,6 @@ public static class CommonIL
     /// OverhealthPlayer.CapOverhealth({player});
     /// </code>
     /// </summary>
-    /// <param name="il"></param>
     public static void ReplaceHealthCapWithCapOverhealth(ILContext il)
     {
         ILCursor c = new(il);

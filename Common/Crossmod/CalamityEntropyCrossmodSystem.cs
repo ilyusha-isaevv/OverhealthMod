@@ -1,6 +1,4 @@
-using System;
 using CalamityEntropy.Common;
-using CalamityEntropy.Content.Items.Weapons;
 using CalamityEntropy.Content.Projectiles;
 using MonoMod.Cil;
 using OverhealthMod.Utils;
