@@ -1,5 +1,4 @@
 using System;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using OverhealthMod.Common.Configs;
 using OverhealthMod.Utils;
@@ -58,10 +57,10 @@ public class OverhealthPlayer : ModPlayer
     public override void Load()
     {
         // Replace all health caps with CapOverhealth
-        IL_Player.ApplyLifeAndOrMana += CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0);
-        IL_Player.Heal += CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0);
-        IL_Player.UpdateLifeRegen += ILModify_Player_UpdateLifeRegen;
-        IL_Player.Update += ILModify_Player_Update;
+        IL_Player.ApplyLifeAndOrMana += CommonIL.ReplaceHealthCapWithCapOverhealth;
+        IL_Player.Heal += CommonIL.ReplaceHealthCapWithCapOverhealth;
+        IL_Player.UpdateLifeRegen += CommonIL.ReplaceHealthCapWithCapOverhealth;
+        IL_Player.Update += CommonIL.ReplaceHealthCapWithCapOverhealth;
         // Spectre armor set bonus healing
         IL_Projectile.VanillaAI += ILModify_Projectile_SpectreHealing;
     }
@@ -92,43 +91,6 @@ public class OverhealthPlayer : ModPlayer
             _overhealthDecreaseCounter %= 60;
 
             Player.statLife -= Math.Min(decrease, Overhealth);
-        }
-    }
-
-    private void ILModify_Player_UpdateLifeRegen(ILContext il)
-    {
-        try
-        {
-            ILCursor c = new(il);
-            c.GotoNext(i => i.MatchLdfld<Player>("lifeRegenCount") && i.Next.MatchLdcI4(120)); // if (this.lifeRegenCount >= 120)
-            c.GotoNext(i => i.MatchLdfld<Player>("statLifeMax2") && i.Next.MatchStfld<Player>("statLife")); // this.statLife = this.statLifeMax2;
-            c.Index -= 7;
-
-            c.RemoveRange(9); // Remove cap check
-            c.EmitLdarg0(); // Load `this` (Player)
-            c.EmitCall(GetType().GetMethod(nameof(CapOverhealth), [typeof(Player)]));
-        }
-        catch (Exception)
-        {
-            MonoModHooks.DumpIL(Mod, il);
-        }
-    }
-
-    private void ILModify_Player_Update(ILContext il)
-    {
-        try
-        {
-            ILCursor c = new(il);
-            // Right before player health cap at the end of Player.Update
-            c.GotoNext(MoveType.After, i => i.MatchCallvirt<Mount>(nameof(Mount.UseDrill)));
-
-            c.RemoveRange(9); // Remove cap check
-            c.EmitLdarg0(); // Load `this` (Player)
-            c.EmitCall(GetType().GetMethod(nameof(CapOverhealth), [typeof(Player)]));
-        }
-        catch (Exception)
-        {
-            MonoModHooks.DumpIL(Mod, il);
         }
     }
 

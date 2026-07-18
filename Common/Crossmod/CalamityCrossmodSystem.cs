@@ -1,8 +1,6 @@
 using System.Reflection;
 using CalamityMod;
 using CalamityMod.Enums;
-using CalamityMod.Items.Tools;
-using CalamityMod.NPCs.Abyss;
 using CalamityMod.NPCs.AstrumAureus;
 using CalamityMod.NPCs.BrimstoneElemental;
 using CalamityMod.NPCs.Bumblebirb;
@@ -16,12 +14,9 @@ using CalamityMod.NPCs.SlimeGod;
 using CalamityMod.NPCs.SupremeCalamitas;
 using CalamityMod.Projectiles.Summon;
 using CalamityMod.Projectiles.Typeless;
-using CalamityMod.UI.ResourceSets;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using OverhealthMod.Utils;
 using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace OverhealthMod.Common.Crossmod;
@@ -36,8 +31,8 @@ public class CalamityCrossmodSystem : ModSystem
         Assembly calamityModAssembly = ModLoader.GetMod("CalamityMod").Code;
 
         // Core methods
-        QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.ConsumeItemViaQuickBuff), CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0));
-        QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.HealPlayer), CommonIL.ReplaceHealthCapWithOverhealthCap(OpCodes.Ldarg_0));
+        QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.ConsumeItemViaQuickBuff), CommonIL.ReplaceHealthCapWithCapOverhealth);
+        QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.HealPlayer), CommonIL.ReplaceHealthCapWithCapOverhealth);
 
         // NPCs - Heart drops
         QuickIL.EditMethod<BrimstoneHeart>(nameof(BrimstoneHeart.OnKill), CommonIL.RemoveHealthCapCheck_Array);
@@ -61,7 +56,7 @@ public class CalamityCrossmodSystem : ModSystem
         QuickIL.EditMethod<AureusSpawn>(nameof(AureusSpawn.OnKill), CommonIL.RemoveHealthCapCheck_Array);
 
         // Summons
-        QuickIL.EditMethod<SandElementalHealer>(nameof(SandElementalHealer.AI), CommonIL.RemoveHealthCapCheck(OpCodes.Ldloc_0));
+        QuickIL.EditMethod<SandElementalHealer>(nameof(SandElementalHealer.AI), CommonIL.RemoveHealthCapCheck_Bge);
 
         // Inline. For some reason HealPlayer method inside these methods gets inlined, making it work as default unpatched version of HealPlayer.
         // Any IL patch will make this method un-inlined, so HealPlayer will be called via Call OpCode.
