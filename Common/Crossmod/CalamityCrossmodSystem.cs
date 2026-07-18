@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using CalamityMod;
 using CalamityMod.Enums;
@@ -33,6 +34,7 @@ public class CalamityCrossmodSystem : ModSystem
         // Core methods
         QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.ConsumeItemViaQuickBuff), CommonIL.ReplaceHealthCapWithCapOverhealth);
         QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.HealPlayer), CommonIL.ReplaceHealthCapWithCapOverhealth);
+        QuickIL.EditMethod(typeof(CalamityUtils), nameof(CalamityUtils.DoLifestealDirect), RemoveMathMinHealCap);
 
         // NPCs - Heart drops
         QuickIL.EditMethod<BrimstoneHeart>(nameof(BrimstoneHeart.OnKill), CommonIL.RemoveHealthCapCheck_Array);
@@ -68,5 +70,14 @@ public class CalamityCrossmodSystem : ModSystem
     private void DisableInline(ILContext il)
     {
         ILCursor _ = new(il);
+    }
+
+    private void RemoveMathMinHealCap(ILContext il)
+    {
+        ILCursor c = new(il);
+        c.GotoNext(MoveType.Before, i => i.MatchLdfld<Player>(nameof(Player.statLife)) &&
+                                    i.Next.Next.MatchCall(typeof(Math), nameof(Math.Min)));
+        c.Index -= 4;
+        c.RemoveRange(8);
     }
 }
