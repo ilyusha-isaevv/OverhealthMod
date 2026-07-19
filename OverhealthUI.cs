@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
+using OverhealthMod.Common.Configs;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
@@ -25,6 +26,12 @@ public class OverhealthUI : ModSystem
     private Asset<Texture2D> _fancyHeartRight;
     private Asset<Texture2D> _fancyHeartSingle;
     private Asset<Texture2D> _healthBarTexture;
+
+    public static bool ShowOverhealthUI => ModContent.GetInstance<VisualConfig>().ShowOverhealthUI;
+    public static float ClassicDisplaySetOpacity => ModContent.GetInstance<VisualConfig>().ClassicDisplaySetOpacity;
+    public static float FancyDisplaySetOpacity => ModContent.GetInstance<VisualConfig>().FancyDisplaySetOpacity;
+    public static float HorizontalBarsDisplaySetOpacity => ModContent.GetInstance<VisualConfig>().HorizontalBarsDisplaySetOpacity;
+    public static float MultiplayerHealthBarOpacity => ModContent.GetInstance<VisualConfig>().MultiplayerHealthBarOpacity;
 
     public override void Load()
     {
@@ -61,6 +68,9 @@ public class OverhealthUI : ModSystem
             c.EmitLdloc(27); // Player index
             c.EmitDelegate((int playerIdx) =>
             {
+                if (!ShowOverhealthUI || MultiplayerHealthBarOpacity <= 0f)
+                    return;
+
                 Player p = Main.player[playerIdx];
 
                 Vector2 pos = p.Bottom;
@@ -79,6 +89,8 @@ public class OverhealthUI : ModSystem
     private void MultiplayerHealthbarOverhealth(On_NewMultiplayerClosePlayersOverlay.orig_Draw orig, NewMultiplayerClosePlayersOverlay self)
     {
         orig(self);
+        if (!ShowOverhealthUI || MultiplayerHealthBarOpacity <= 0f)
+            return;
         if (Main.teamNamePlateDistance <= 0)
             return;
 
@@ -104,7 +116,7 @@ public class OverhealthUI : ModSystem
 
     private void DrawOverhealthOverHealthBar(Vector2 pos, int overhealth, int maxLife, float alpha, float scale = 1f, bool noFlip = false)
     {
-        if (overhealth <= 0) return;
+        if (MultiplayerHealthBarOpacity <= 0f || overhealth <= 0) return;
 
         // Logic taken from System.Void Terraria.Main::DrawHealthBar()
         float num3 = pos.X - 18f * scale;
@@ -129,7 +141,7 @@ public class OverhealthUI : ModSystem
             _healthBarTexture.Value,
             drawPosition,
             sourceRect,
-            Color.White * alpha * 0.7f,
+            Color.White * alpha * MultiplayerHealthBarOpacity,
             0f,
             Vector2.Zero,
             scale,
@@ -141,6 +153,8 @@ public class OverhealthUI : ModSystem
     private void DrawClassicOverhealth(On_ClassicPlayerResourcesDisplaySet.orig_DrawLife orig, ClassicPlayerResourcesDisplaySet self)
     {
         orig(self);
+        if (!ShowOverhealthUI || ClassicDisplaySetOpacity <= 0f)
+            return;
 
         int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
@@ -160,7 +174,14 @@ public class OverhealthUI : ModSystem
         {
             float percentFilled = (overhealth - (segmentIndex - 1) * hpSegmentValue) / hpSegmentValue;
             if (percentFilled <= 0f) break;
-            float opacity = percentFilled >= 1f ? 0.6f : 0.15f + 0.45f * percentFilled;
+
+            float opacity = ClassicDisplaySetOpacity;
+            if (percentFilled < 1f)
+            {
+                float constantPart = Math.Min(ClassicDisplaySetOpacity / 4f, 0.15f);
+                float variablePart = ClassicDisplaySetOpacity - constantPart;
+                opacity = constantPart + variablePart * percentFilled;
+            }
 
             int segmentXOffset = 0;
             int segmentYOffset = 0;
@@ -193,6 +214,8 @@ public class OverhealthUI : ModSystem
     private void DrawFancyOverhealth(On_FancyClassicPlayerResourcesDisplaySet.orig_DrawLifeBar orig, FancyClassicPlayerResourcesDisplaySet self, SpriteBatch spriteBatch)
     {
         orig(self, spriteBatch);
+        if (!ShowOverhealthUI || FancyDisplaySetOpacity <= 0f)
+            return;
 
         int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
@@ -215,9 +238,13 @@ public class OverhealthUI : ModSystem
             float percentFilled = (overhealth - i * hpSegmentValue) / hpSegmentValue;
             if (percentFilled <= 0f) break;
 
-            float opacity = 0.6f;
+            float opacity = FancyDisplaySetOpacity;
             if (percentFilled < 1f)
-                opacity = 0.1f + 0.5f * percentFilled;
+            {
+                float constantPart = Math.Min(FancyDisplaySetOpacity / 6f, 0.1f);
+                float variablePart = FancyDisplaySetOpacity - constantPart;
+                opacity = constantPart + variablePart * percentFilled;
+            }
 
             Asset<Texture2D> texture = _fancyHeartMiddle;
             if (heartCountRow1 == 1)
@@ -249,9 +276,13 @@ public class OverhealthUI : ModSystem
             float percentFilled = (overhealth - globalIndex * hpSegmentValue) / hpSegmentValue;
             if (percentFilled <= 0f) break;
 
-            float opacity = 0.6f;
+            float opacity = FancyDisplaySetOpacity;
             if (percentFilled < 1f)
-                opacity = 0.1f + 0.5f * percentFilled;
+            {
+                float constantPart = Math.Min(FancyDisplaySetOpacity / 6f, 0.1f);
+                float variablePart = FancyDisplaySetOpacity - constantPart;
+                opacity = constantPart + variablePart * percentFilled;
+            }
 
             Asset<Texture2D> texture = _fancyHeartMiddle;
             if (heartCountRow2 == 1)
@@ -280,6 +311,8 @@ public class OverhealthUI : ModSystem
     private void DrawHorizontalBarsOverhealth(On_HorizontalBarsPlayerResourcesDisplaySet.orig_Draw orig, HorizontalBarsPlayerResourcesDisplaySet self)
     {
         orig(self);
+        if (!ShowOverhealthUI || HorizontalBarsDisplaySetOpacity <= 0f)
+            return;
 
         int overhealth = Main.LocalPlayer.GetOverhealth();
         if (overhealth == 0) return;
@@ -317,7 +350,8 @@ public class OverhealthUI : ModSystem
             );
 
             if (i < fullSegments) // Draw full segment without source rect
-                spriteBatch.Draw(_horizontalBarMiddlePanelTexture.Value, segmentPos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(_horizontalBarMiddlePanelTexture.Value, segmentPos, null,
+                                Color.White * HorizontalBarsDisplaySetOpacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             else
             {
                 float percentFilled = overhealth % hpSegmentValue / (float)hpSegmentValue;
@@ -327,7 +361,8 @@ public class OverhealthUI : ModSystem
                     middleHpSegmentWidth - xOffset, _horizontalBarMiddlePanelTexture.Value.Height
                 );
                 Vector2 newPos = new(segmentPos.X + xOffset, segmentPos.Y);
-                spriteBatch.Draw(_horizontalBarMiddlePanelTexture.Value, newPos, sourceRect, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(_horizontalBarMiddlePanelTexture.Value, newPos, sourceRect,
+                                Color.White * HorizontalBarsDisplaySetOpacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
         }
 
