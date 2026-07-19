@@ -70,7 +70,8 @@ public class ThoriumCrossmodSystem : ModSystem
 
         // Armor
         QuickIL.EditMethod<ThoriumPlayer>(nameof(ThoriumPlayer.OnHurt), CommonIL.RemoveHealthCapCheck_Bge); // Fallen Paladin set
-        QuickIL.EditMethod<ThoriumProjectileFix>("HealerOnHitNPC", CommonIL.RemoveHealthCapCheck_Bge); // Iridescent set
+        QuickIL.EditMethod<ThoriumProjectileFix>("HealerOnHitNPC",
+            BindingFlags.NonPublic | BindingFlags.Instance, CommonIL.RemoveHealthCapCheck_Bge); // Iridescent set
 
         // Minions
         QuickIL.EditMethod<BannerMoraleHeartPro>(nameof(BannerMoraleHeartPro.AI), CommonIL.RemoveHealthCapCheck_Bge);
