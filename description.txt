@@ -1,15 +1,18 @@
 Overhealth is a mod that introduces a temporary overhealing mechanic.
 
 How it works:
-When you receive healing while already at maximum health, any excess healing is converted into temporary Overhealth. Overhealth slowly decays over time.
-This mechanic supports almost all healing methods (except natural health regen, which is capped at max health).
-Also this mod works in multiplayer!
+When you receive healing while already at maximum health, any excess healing is converted into temporary Overhealth:
+- Works as extension of max life.
+- Overhealth slowly decays over time. The more Overhealth you have, the faster it decays.
+- Supports all healing methods, except natural health regen.
+- Works in multiplayer.
 
 Mod Configuration:
-The config contains settings mostly for decay rates. Check it out to balance the experience for your own gameplay!
+In Gameplay Config you can configure the maximum overhealth amount and decay rates. Check it out to balance the experience for your own gameplay!
+In Visuals Config you can configure the overhealth UI.
 
 Cross-Mod Compatibility:
-Unsupported mods might break the overhealth mechanic (e.g. reset overhealth to 0).
+If you noticed that suddenly all your overhealth resets, it means that some mod is unsupported, which breaks the mechanic.
 To check out which mods are supported read the mod page on Steam Workshop.
 
-Official compatibility for other popular mods will be added in future updates.
+Official compatibility for other mods will be added in future updates if requested.
