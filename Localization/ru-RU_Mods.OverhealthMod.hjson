@@ -1,19 +1,37 @@
 Colors: {
+	// Note: 8FCBFF
 	// UsefulToKnow: FE95FF
 	// Mention: FFAB65
+	// Overhealth: FFE999
 }
 
 Configs: {
 	GameplayConfig: {
-		DisplayName: Настройки геймплея
+		DisplayName: Геймплей
 
-		ConstantDecreaseRate: {
-			Name: Постоянная скорость распада
-			Label: "[c/A3C6FF:Постоянная] скорость распада"
-			Tooltip: Базовая скорость потери сверхздоровья, выраженная в [c/{$Colors.UsefulToKnow}:процентах от максимального здоровья в секунду].
+		Headers.Decay: Распад
+
+		MaximumOverhealth: {
+			Name: Максимальное сверхздоровье
+			Label: Максимальное [c/{$Colors.Overhealth}:сверхздоровье]
+			Tooltip:
+				'''
+				Максимальное количество сверхздоровья, которое может иметь игрок.
+				Выражается в [c/{$Colors.UsefulToKnow}:процентах от максимального здоровья].
+				'''
 		}
 
-		ProgressiveDecreaseRate: {
+		ConstantDecayPercent: {
+			Name: Постоянная скорость распада
+			Label: "[c/A3C6FF:Постоянная] скорость распада"
+			Tooltip:
+				'''
+				Базовая скорость потери сверхздоровья.
+				Выражается в [c/{$Colors.UsefulToKnow}:процентах от максимального здоровья в секунду].
+				'''
+		}
+
+		ProgressiveDecayPercent: {
 			Name: Прогрессивная скорость распада
 			Label: "[c/C5A3FF:Прогрессивная] скорость распада"
 			Tooltip:
@@ -24,9 +42,62 @@ Configs: {
 				'''
 		}
 
-		OverhealthDecreaseRateMutiplier: {
+		DecayMutiplier: {
 			Label: Множитель скорости [c/FFA3A3:распада]
-			Tooltip: Общий множитель, применяемый как к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecreaseRate.Name}], так и к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecreaseRate.Name}].
+			Tooltip: Общий множитель, применяемый как к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecayPercent.Name}], так и к [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecayPercent.Name}].
+		}
+	}
+
+	VisualConfig: {
+		DisplayName: Визуал
+
+		Headers.Opacity: Прозрачность
+
+		Common.DisableNote: "[c/{$Colors.Note}:Установите на 0 для отключения.]"
+
+		ShowOverhealthUI: {
+			Label: Показывать интерфейс сверхздоровья
+			Tooltip: Включение/отключение отображения всех элементов интерфейса сверхздоровья.
+		}
+
+		ClassicDisplaySetOpacity: {
+			Name: "Прозрачность стиля {$UI.HealthManaStyle_Default}" 
+			Label: "Прозрачность стиля [c/FFC2EC:{$UI.HealthManaStyle_Default}]"
+			Tooltip:
+				'''
+				Настраивает прозрачность отображения сверхздоровья для стиля {$UI.HealthManaStyle_Default}.
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		FancyDisplaySetOpacity: {
+			Name: "Прозрачность стиля {$UI.HealthManaStyle_New}"
+			Label: "Прозрачность стиля [c/FFC2EC:{$UI.HealthManaStyle_New}]"
+			Tooltip:
+				'''
+				Настраивает прозрачность отображения сверхздоровья для стилей {$UI.HealthManaStyle_New} и {$UI.HealthManaStyle_NewWithText}.
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		HorizontalBarsDisplaySetOpacity: {
+			Name: "Прозрачность стиля {$UI.HealthManaStyle_HorizontalBars}"
+			Label: "Прозрачность стиля [c/FFC2EC:{$UI.HealthManaStyle_HorizontalBars}]"
+			Tooltip:
+				'''
+				Настраивает прозрачность отображения сверхздоровья для стилей {$UI.HealthManaStyle_HorizontalBars}, {$UI.HealthManaStyle_HorizontalBarsWithText} и {$UI.HealthManaStyle_HorizontalBarsWithFullText}.
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		MultiplayerHealthBarOpacity: {
+			Name: Прозрачность полос здоровья в мультиплеере
+			Label: "Прозрачность [c/DEC2FF:мультиплеерных] полос здоровья"
+			Tooltip:
+				'''
+				Настраивает прозрачность отображения сверхздоровья на полосах здоровья других игроков.
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
 		}
 	}
 }

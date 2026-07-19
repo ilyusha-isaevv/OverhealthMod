@@ -1,13 +1,27 @@
 Colors: {
+	Note: 8FCBFF
 	UsefulToKnow: FE95FF
 	Mention: FFAB65
+	Overhealth: FFE999
 }
 
 Configs: {
 	GameplayConfig: {
-		DisplayName: Gameplay Config
+		DisplayName: Gameplay
 
-		ConstantDecreaseRate: {
+		Headers.Decay: Decay
+
+		MaximumOverhealth: {
+			Name: Maximum overhealth
+			Label: Maximum [c/{$Colors.Overhealth}:overhealth]
+			Tooltip:
+				'''
+				The maximum amount of overhealth the player can have.
+				Expressed as a [c/{$Colors.UsefulToKnow}:percentage of max life].
+				'''
+		}
+
+		ConstantDecayPercent: {
 			Name: Constant decay rate
 			Label: "[c/A3C6FF:Constant] decay rate"
 			Tooltip:
@@ -17,7 +31,7 @@ Configs: {
 				'''
 		}
 
-		ProgressiveDecreaseRate: {
+		ProgressiveDecayPercent: {
 			Name: Progressive decay rate
 			Label: "[c/C5A3FF:Progressive] decay rate"
 			Tooltip:
@@ -28,9 +42,62 @@ Configs: {
 				'''
 		}
 
-		OverhealthDecreaseRateMutiplier: {
+		DecayMutiplier: {
 			Label: Decay rate [c/FFA3A3:multiplier]
-			Tooltip: Overall multiplier applied to both the [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecreaseRate.Name}] and [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecreaseRate.Name}].
+			Tooltip: Overall multiplier applied to both the [c/{$Colors.Mention}:{$Configs.GameplayConfig.ConstantDecayPercent.Name}] and [c/{$Colors.Mention}:{$Configs.GameplayConfig.ProgressiveDecayPercent.Name}].
+		}
+	}
+
+	VisualConfig: {
+		DisplayName: Visuals
+
+		Headers.Opacity: Opacity
+
+		Common.DisableNote: "[c/{$Colors.Note}:Set to 0 to disable.]"
+
+		ShowOverhealthUI: {
+			Label: Show Overhealth UI
+			Tooltip: Toggle the rendering of all Overhealth UI elements.
+		}
+
+		ClassicDisplaySetOpacity: {
+			Name: "{$UI.HealthManaStyle_Default} style opacity"
+			Label: "[c/FFC2EC:{$UI.HealthManaStyle_Default}] style opacity"
+			Tooltip:
+				'''
+				Adjusts the opacity of the overhealth overlay on the {$UI.HealthManaStyle_Default} style. 
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		FancyDisplaySetOpacity: {
+			Name: "{$UI.HealthManaStyle_New} style opacity"
+			Label: "[c/FFC2EC:{$UI.HealthManaStyle_New}] style opacity"
+			Tooltip:
+				'''
+				Adjusts the opacity of the overhealth overlay on the {$UI.HealthManaStyle_New}, {$UI.HealthManaStyle_NewWithText} styles. 
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		HorizontalBarsDisplaySetOpacity: {
+			Name: "{$UI.HealthManaStyle_HorizontalBars} style opacity"
+			Label: "[c/FFC2EC:{$UI.HealthManaStyle_HorizontalBars}] style opacity"
+			Tooltip:
+				'''
+				Adjusts the opacity of the overhealth overlay on the {$UI.HealthManaStyle_HorizontalBars}, {$UI.HealthManaStyle_HorizontalBarsWithText}, {$UI.HealthManaStyle_HorizontalBarsWithFullText} styles. 
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
+		}
+
+		MultiplayerHealthBarOpacity: {
+			Name: Multiplayer health bars opacity
+			Label: "[c/DEC2FF:Multiplayer] health bars opacity"
+			Tooltip:
+				'''
+				Adjusts the opacity of the overhealth overlay shown on health bars under other players.
+				{$Configs.VisualConfig.Common.DisableNote}
+				'''
 		}
 	}
 }
