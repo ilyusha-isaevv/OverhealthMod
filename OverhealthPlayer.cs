@@ -11,47 +11,74 @@ public static class OverhealthExtension
 {
     /// <inheritdoc cref="OverhealthPlayer.Overhealth"/>
     public static int GetOverhealth(this Player p) => Math.Max(0, p.statLife - p.statLifeMax2);
+
+    /// <inheritdoc cref="OverhealthPlayer.MaximumOverhealth"/>
+    public static int GetMaximumOverhealth(this Player p) =>
+        Math.Max(1, (int)(p.statLifeMax2 * OverhealthPlayer.MaximumOverhealthPercent / 100f));
 }
 
 public class OverhealthPlayer : ModPlayer
 {
+    #region Config values
+    public static float MaximumOverhealthPercent => ModContent.GetInstance<GameplayConfig>().MaximumOverhealth;
+    public static float ConstantDecayPercent => ModContent.GetInstance<GameplayConfig>().ConstantDecayPercent;
+    public static float ProgressiveDecayPercent => ModContent.GetInstance<GameplayConfig>().ProgressiveDecayPercent;
+    public static float DecayMultiplier => ModContent.GetInstance<GameplayConfig>().DecayMutiplier;
+    #endregion
+
+    private int _overhealthDecreaseCounter = 0;
+
     /// <summary>
     /// Overhealth basically is the health above maximum health. 
     /// </summary>
     /// <remarks>Cannot be lower than 0.</remarks>
     public int Overhealth => Math.Max(0, Player.statLife - Player.statLifeMax2);
 
-    public float OverhealthDecreaseRateMultiplier => ModContent.GetInstance<GameplayConfig>().OverhealthDecreaseRateMutiplier;
-    public float ConstantDecreaseRate => ModContent.GetInstance<GameplayConfig>().ConstantDecreaseRate;
-    public float ProgressiveDecreaseRate => ModContent.GetInstance<GameplayConfig>().ProgressiveDecreaseRate;
+    /// <summary>
+    /// Maximum <see cref="Overhealth"/> the player can have.
+    /// </summary>
+    public int MaximumOverhealth => Math.Max(1, (int)(Player.statLifeMax2 * MaximumOverhealthPercent / 100f));
+
+    /// <summary>   
+    /// The base value of <see cref="Overhealth"/> passive decrease. <br/>
+    /// <b>Raw</b> means it's a <c>float</c> value, while <see cref="Overhealth"/> is an <c>int</c> value.
+    /// </summary>
+    public float ConstantDecayRaw => (int)(Player.statLifeMax2 * ConstantDecayPercent / 100f);
 
     /// <summary>
-    /// Amount of overhealth passive decrease divided by 60 per second. The more overhealth, the faster it decreases. 
-    /// Constant decrease rate is <see cref="ConstantDecreaseRate"/> of max health per second.
-    /// Progressive decrease rate is <see cref="ProgressiveDecreaseRate"/> of max health per second.
+    /// The extra value of <see cref="Overhealth"/> passive decrease that scales with current overhealth.
     /// </summary>
-    /// <see cref="DecreaseOverhealthTick"/>
-    public int OverhealthDecreaseRate => (int)(OverhealthDecreaseRateMultiplier *
-        ((Player.statLifeMax2 / 100f * ConstantDecreaseRate) + // Constant decrease rate
-        (Overhealth / (float)Player.statLifeMax2 * Player.statLifeMax2 / 100f * ProgressiveDecreaseRate)) // Variable decrease rate based on current overhealth
-    );
+    public float ProgressiveDecayRaw =>
+        (float)Overhealth / MaximumOverhealth * MaximumOverhealth * ProgressiveDecayPercent / 100f;
 
-    private int _overhealthDecreaseCounter = 0;
+    /// <summary>
+    /// Amount of overhealth passive decrease divided by 60 per second.
+    /// </summary>
+    public float OverhealthDecayRaw => DecayMultiplier * (ConstantDecayRaw + ProgressiveDecayRaw);
+
+    /// <summary>
+    /// Post-processed value of <see cref="OverhealthDecayRaw"/>.
+    /// </summary>
+    /// <remarks>
+    /// Always greater than 0.
+    /// </remarks>
+    /// <see cref="DecreaseOverhealthTick"/>
+    public int OverhealthDecay => Math.Max(1, (int)Math.Round(OverhealthDecayRaw));
 
     /// <summary>
     /// Caps the overhealth at <see cref="Player.statLifeMax2"/>.
     /// </summary>
     public static void CapOverhealth(Player player)
     {
-        if (player.GetOverhealth() > player.statLifeMax2)
-            player.statLife = player.statLifeMax2 * 2;
+        if (player.GetOverhealth() > player.GetMaximumOverhealth())
+            player.statLife = player.statLifeMax2 + player.GetMaximumOverhealth();
     }
 
     /// <inheritdoc cref="CapOverhealth(Player)"/>
     public void CapOverhealth()
     {
-        if (Overhealth > Player.statLifeMax2)
-            Player.statLife = Player.statLifeMax2 * 2;
+        if (Overhealth > MaximumOverhealth)
+            Player.statLife = Player.statLifeMax2 + MaximumOverhealth;
     }
 
     public override void Load()
@@ -83,7 +110,7 @@ public class OverhealthPlayer : ModPlayer
         if (Overhealth == 0)
             return;
 
-        _overhealthDecreaseCounter += OverhealthDecreaseRate;
+        _overhealthDecreaseCounter += OverhealthDecay;
 
         if (_overhealthDecreaseCounter >= 60)
         {

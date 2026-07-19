@@ -10,6 +10,7 @@ public class VisualConfig : ModConfig
     [DefaultValue(true)]
     public bool ShowOverhealthUI { get; set; }
 
+    [Header("Opacity")]
     [Range(0f, 1f)]
     [Increment(0.05f)]
     [DefaultValue(0.6f)]
